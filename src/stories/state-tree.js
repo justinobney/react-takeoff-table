@@ -1,8 +1,8 @@
 const stateTree = {
     takeoffs: {
-        0: {id:0, projectAbbreviationId:1},
         1: {id:1, projectAbbreviationId:1},
         2: {id:2, projectAbbreviationId:2},
+        3: {id:3, projectAbbreviationId:1},
     },
     abbreviations: {
         1: {id:1, name:'AF'},
