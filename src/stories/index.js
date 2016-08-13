@@ -2,7 +2,7 @@ import React from 'react';
 import { storiesOf } from '@kadira/storybook';
 
 import stateTree from './state-tree.js';
-import TakeoffTableEditor from '../TakeoffTableEditor/TakeoffTableEditor.js';
+import {TakeoffTableEditor} from '../TakeoffTableEditor/TakeoffTableEditor.js';
 import TakeoffRow from '../TakeoffTableEditor/TakeoffRow.js'
 
 storiesOf('TakeoffTableEditor', module)

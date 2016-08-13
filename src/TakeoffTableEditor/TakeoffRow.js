@@ -5,12 +5,17 @@ import TakeoffViewRow from './TakeoffViewRow.js';
 class TakeoffRow extends Component {
   static defaultProps = { takeoff: {} };
   render() {
-    const {takeoff, editTakeoffId} = this.props;
+    const {takeoff, editTakeoffId, changes, onChange, onViewRowClick} = this.props;
     const Component = takeoff.id === editTakeoffId
       ? TakeoffEditRow
       : TakeoffViewRow;
-
-    return <Component takeoff={takeoff} />;
+    return (
+      <Component
+        takeoff={takeoff}
+        changes={changes}
+        onChange={onChange}
+        onViewRowClick={onViewRowClick} />
+    );
   }
 }
 

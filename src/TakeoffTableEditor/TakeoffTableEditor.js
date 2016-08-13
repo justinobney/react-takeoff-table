@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
-import '../../node_modules/semantic-ui-css/semantic.css'
+import { connect } from 'react-redux';
 
 import TakeoffRow from './TakeoffRow.js';
 import TakeoffEditRow from './TakeoffEditRow.js';
 
-const mapObject = (obj, fn) =>
-  Object.keys(obj).map(
-    key =>
-      fn(obj[key], key, obj)
-  );
+import {mutationIntent, changeEditedTakeoff} from '../store.js';
+
+import '../../node_modules/semantic-ui-css/semantic.css'
+
+const mapObject = (obj) =>
+  Object.keys(obj).map(key => obj[key]);
 
 const EMPTY_ROW_STYLE = {
   height: '51px',
@@ -19,16 +20,55 @@ const DOM_PROPS = {
   style: EMPTY_ROW_STYLE
 };
 
+const mapStateToProps = (state) => {
+  const {bigReducer: {takeoffs, mutationIntent}} = state;
+  return {
+    takeoffs,
+    editTakeoffId: mutationIntent.takeoffs.id,
+    changes: mutationIntent.takeoffs.changes
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onChange: (...args) => {
+      dispatch(mutationIntent(...args))
+    },
+    onViewRowClick: (id) => dispatch(changeEditedTakeoff(id))
+  }
+}
+
 class TakeoffTableEditor extends Component {
   static defaultProps = { takeoffs: [] };
+  renderTakeoffRow(t){
+    const {editTakeoffId, changes, onChange, onViewRowClick} = this.props;
+    return (
+      <TakeoffRow
+        key={t.id}
+        takeoff={t}
+        changes={changes}
+        onChange={onChange}
+        onViewRowClick={onViewRowClick}
+        editTakeoffId={editTakeoffId} />
+    );
+  }
   render() {
-    const {takeoffs, editTakeoffId} = this.props;
+    const {takeoffs, changes, onChange, onViewRowClick} = this.props;
 
     const EMPTY_ROW = (
-      <tr {...DOM_PROPS}>
+      <tr {...DOM_PROPS}
+        onClick={() => onViewRowClick(0)}>
         <td colSpan="10">&nbsp;</td>
       </tr>
     );
+
+    const NewRow = this.props.editTakeoffId === 0
+      ? <TakeoffEditRow
+          domProps={DOM_PROPS}
+          takeoff={takeoffs[0]}
+          changes={changes}
+          onChange={onChange} />
+      : EMPTY_ROW;
 
     return (
       <div className="ui padded grid">
@@ -49,19 +89,11 @@ class TakeoffTableEditor extends Component {
               </tr>
             </thead>
             <tbody>
+              {NewRow}
               {
-                this.props.editTakeoffId === 0
-                  ? <TakeoffEditRow domProps={DOM_PROPS}
-                      takeoff={takeoffs[0]} />
-                  : EMPTY_ROW
-              }
-              {
-                mapObject(
-                  takeoffs,
-                  t => <TakeoffRow key={t.id}
-                        takeoff={t}
-                        editTakeoffId={editTakeoffId} />
-                )
+                mapObject(takeoffs)
+                  .filter(t=>!!t.id)
+                  .map(t => this.renderTakeoffRow(t))
               }
             </tbody>
             <tfoot>
@@ -89,4 +121,6 @@ class TakeoffTableEditor extends Component {
   }
 }
 
-export default TakeoffTableEditor;
+export default connect(mapStateToProps, mapDispatchToProps)(TakeoffTableEditor);
+
+export {TakeoffTableEditor};
